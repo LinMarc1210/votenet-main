@@ -47,7 +47,7 @@ if __name__=='__main__':
         sys.path.append(os.path.join(ROOT_DIR, 'sunrgbd'))
         from sunrgbd_detection_dataset import DC # dataset config
         checkpoint_path = os.path.join(demo_dir, 'pretrained_votenet_on_sunrgbd.tar')
-        pc_path = os.path.join(demo_dir, 'input_pc_sunrgbd.ply')
+        pc_path = os.path.join(demo_dir, 'sunrgbd_results', 'pointcloud_20250604_175004.ply')
     elif FLAGS.dataset == 'scannet':
         sys.path.append(os.path.join(ROOT_DIR, 'scannet'))
         from scannet_detection_dataset import DC # dataset config

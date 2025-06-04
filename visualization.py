@@ -2,7 +2,7 @@ import open3d as o3d
 import numpy as np
 
 # === 設定路徑 ===
-ply_path = "demo_files/input_pc_sunrgbd.ply"
+ply_path = "demo_files/sunrgbd_results/pointcloud_20250604_175004.ply"
 txt_path = "demo_files/sunrgbd_results/detection_summary.txt"
 
 # === 讀取點雲 ===
