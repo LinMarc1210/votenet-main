@@ -40,7 +40,6 @@ def preprocess_point_cloud(point_cloud):
     return pc
 
 if __name__=='__main__':
-    
     # Set file paths and dataset config
     demo_dir = os.path.join(BASE_DIR, 'demo_files') 
     if FLAGS.dataset == 'sunrgbd':
@@ -70,7 +69,7 @@ if __name__=='__main__':
         num_size_cluster=DC.num_size_cluster,
         mean_size_arr=DC.mean_size_arr).to(device)
     print('Constructed model.')
-    
+
     # Load checkpoint
     optimizer = optim.Adam(net.parameters(), lr=0.001)
     checkpoint = torch.load(checkpoint_path)
@@ -78,13 +77,13 @@ if __name__=='__main__':
     optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
     epoch = checkpoint['epoch']
     print("Loaded checkpoint %s (epoch: %d)"%(checkpoint_path, epoch))
-   
+
     # Load and preprocess input point cloud 
     net.eval() # set model to eval mode (for bn and dp)
     point_cloud = read_ply(pc_path)
     pc = preprocess_point_cloud(point_cloud)
     print('Loaded point cloud data: %s'%(pc_path))
-   
+
     # Model inference
     inputs = {'point_clouds': torch.from_numpy(pc).to(device)}
     tic = time.time()
@@ -95,7 +94,7 @@ if __name__=='__main__':
     end_points['point_clouds'] = inputs['point_clouds']
     pred_map_cls = parse_predictions(end_points, eval_config_dict)
     print('Finished detection. %d object detected.'%(len(pred_map_cls[0])))
-  
+
     dump_dir = os.path.join(demo_dir, '%s_results'%(FLAGS.dataset))
     if not os.path.exists(dump_dir): os.mkdir(dump_dir) 
     MODEL.dump_results(end_points, dump_dir, DC, True)
@@ -116,7 +115,7 @@ if __name__=='__main__':
 
     output_path = os.path.join(dump_dir, 'detection_summary.txt')
     with open(output_path, 'w') as f:
-        f.write("x\ty\tz\tclass_name\tscore\n")
+        f.write("x\ty\tz\tlength\twidth\theight\tclass_name\tscore\n")
         pred_mask = end_points['pred_mask'][0]
         for i in range(box_centers.shape[0]):
             if pred_mask[i] == 0:
@@ -125,6 +124,7 @@ if __name__=='__main__':
             cls = sem_cls_preds[i]
             score = sem_cls_confs[i]
             class_name = CLASS_NAMES[cls] if cls < len(CLASS_NAMES) else 'unknown'
-            f.write(f"{x:.3f}\t{y:.3f}\t{z:.3f}\t{class_name}\t{score:.3f}\n")
+            lx, ly, lz = 0.8, 0.8, 0.8
+            f.write(f"{x:.3f}\t{y:.3f}\t{z:.3f}\t{lx:.3f}\t{ly:.3f}\t{lz:.3f}\t{class_name}\t{score:.3f}\n")
 
-    print(f"✅ 類別名稱與分數已輸出至: {output_path}")
+    print(f"✅ 類別與尺寸資訊已輸出至: {output_path}")
